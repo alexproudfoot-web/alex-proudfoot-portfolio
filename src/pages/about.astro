@@ -99,20 +99,27 @@ import portrait from "../assets/images/DSCF9214.JPG";
   }
 
   @media (min-width: 48rem) {
+    .hero {
+      max-width: none;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      align-items: end;
+      gap: 2.5rem;
+      justify-content: center;
+    }
+
     .portrait {
-      width: 32rem;
-      max-width: 62vw;
+      width: min(56vw, 48rem);
+      max-width: 100%;
       aspect-ratio: 3 / 4;
     }
 
     .card {
-      position: absolute;
-      left: 20rem;
-      bottom: 3rem;
-      width: 26rem;
-      max-width: 60vw;
+      position: static;
+      width: auto;
+      max-width: none;
       margin: 0;
-      padding: 2.5rem 2.25rem;
+      padding: 2rem 1.75rem;
     }
   }
 </style>

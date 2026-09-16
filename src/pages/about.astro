@@ -10,36 +10,27 @@ import portrait from "../assets/images/DSCF9214.JPG";
   description={`About ${site.name} — photography and motion, based in ${site.location}.`}
 >
   <div class="shell">
-    <div class="section-head">
-      <h2>About</h2>
-      <p class="label">{site.location}</p>
-    </div>
-
-    <div class="layout">
+    <div class="hero" data-reveal>
       <figure class="portrait frame">
         <Image
           src={portrait}
           alt={`${site.name} standing in a sunflower field, giving a thumbs up, camera around his neck.`}
           widths={[480, 720, 960]}
-          sizes="(min-width: 48rem) 24rem, 90vw"
+          sizes="(min-width: 48rem) 32rem, 90vw"
           quality={82}
           loading="eager"
         />
       </figure>
 
-      <div class="bio">
+      <div class="card glass">
+        <h1>{site.name}</h1>
         <p class="prose">
           {site.location} is home base, but most of the work happens
           somewhere else — a track, a driveway, a stretch of road at the
-          right hour.
-        </p>
-        <p class="prose">
-          I started shooting in 2019. Cars were already the obsession; the
-          camera just gave it somewhere to go.
-        </p>
-        <p class="prose">
-          Now it's one thing: chasing good light, good cars, and the people
-          who keep them running.
+          right hour. I started shooting in 2019: cars were already the
+          obsession, the camera just gave it somewhere to go. Now it's one
+          thing — chasing good light, good cars, and the people who keep
+          them running.
         </p>
 
         <p class="label contact-line">
@@ -60,42 +51,68 @@ import portrait from "../assets/images/DSCF9214.JPG";
 
 <style>
   .shell {
-    padding-top: var(--frame-gap);
-    padding-bottom: var(--frame-gap);
+    padding-block: var(--frame-gap);
   }
 
-  .layout {
-    display: grid;
-    gap: 2.5rem;
+  .hero {
+    position: relative;
+    max-width: 58rem;
   }
 
   .portrait {
     margin: 0;
-    max-width: 22rem;
+    width: 100%;
+    aspect-ratio: 3 / 4;
   }
 
-  .bio {
-    display: grid;
-    gap: 1.25rem;
-    align-content: start;
-    max-width: var(--measure);
+  .portrait :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card {
+    margin-top: -3.5rem;
+    margin-inline: 1.25rem;
+    padding: 2rem 1.75rem;
+  }
+
+  .card h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    color: var(--cyanotype);
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+  }
+
+  .card .prose {
+    font-size: var(--t-body);
+    max-width: none;
   }
 
   .contact-line {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1.25rem;
-    margin-top: 0.5rem;
+    margin-top: 1.25rem;
   }
 
   @media (min-width: 48rem) {
-    .layout {
-      grid-template-columns: 20rem minmax(0, 1fr);
-      gap: var(--frame-gap);
+    .portrait {
+      width: 32rem;
+      max-width: 62vw;
+      aspect-ratio: 3 / 4;
     }
 
-    .portrait {
-      max-width: none;
+    .card {
+      position: absolute;
+      left: 20rem;
+      bottom: 3rem;
+      width: 26rem;
+      max-width: 60vw;
+      margin: 0;
+      padding: 2.5rem 2.25rem;
     }
   }
 </style>

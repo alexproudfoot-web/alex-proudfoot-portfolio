@@ -101,25 +101,26 @@ import portrait from "../assets/images/DSCF9214.JPG";
   @media (min-width: 48rem) {
     .hero {
       max-width: none;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 20rem;
-      align-items: end;
-      gap: 2.5rem;
-      justify-content: center;
+      width: min(56vw, 48rem);
+      margin-inline: auto;
     }
 
     .portrait {
-      width: min(56vw, 48rem);
-      max-width: 100%;
+      width: 100%;
       aspect-ratio: 3 / 4;
     }
 
     .card {
-      position: static;
-      width: auto;
-      max-width: none;
-      margin: 0;
-      padding: 2rem 1.75rem;
+      /* Kept in normal flow (not absolutely positioned) so its full
+         height still pushes the page's footer down — only the negative
+         margin-top overlaps the photo, by a fixed, small amount, clear
+         of the subject regardless of how tall the bio text makes the
+         card. */
+      margin: -5rem 0 0 auto;
+      transform: translateX(6rem);
+      width: 21rem;
+      max-width: 55vw;
+      padding: 2.25rem 2rem;
     }
   }
 </style>

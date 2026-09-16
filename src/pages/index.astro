@@ -1,0 +1,349 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Film from "../components/Film.astro";
+import { site } from "../site";
+
+const stills = (await getCollection("stills")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const films = (await getCollection("films")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+// A few real slides are duplicated at each end so the strip can be
+// scrolled (or looped via the arrows) straight through the seam — the
+// first photo is already sitting right after the last one, same as any
+// other neighbour, so there's no jump-cut to fake. The script below
+// silently re-teleports off these clones onto the matching real slide
+// once the scroll settles, so the illusion holds no matter how far you
+// scroll.
+const cloneCount = Math.min(2, stills.length);
+const leadingClones = stills.slice(-cloneCount);
+const trailingClones = stills.slice(0, cloneCount);
+---
+
+<Base>
+  <section class="filmstrip-wrap" data-reveal>
+    <button class="fs-nav prev glass" type="button" aria-label="Previous photograph" data-fs-prev>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M15 6l-6 6 6 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <ul class="filmstrip" data-filmstrip>
+      {
+        leadingClones.map((still) => (
+          <li class="fs-item" data-id={still.id} data-clone="true" aria-hidden="true">
+            <a href={`/stills/${still.id}/`} class="frame" tabindex="-1">
+              <Image
+                src={still.data.image}
+                alt=""
+                widths={[480, 900, 1400, 2000]}
+                sizes="(min-width: 48rem) 50vw, 80vw"
+                quality={82}
+                loading="lazy"
+              />
+            </a>
+          </li>
+        ))
+      }
+      {
+        stills.map((still, i) => (
+          <li class="fs-item" data-id={still.id}>
+            <a href={`/stills/${still.id}/`} class="frame" transition:name={`still-${still.id}`}>
+              <Image
+                src={still.data.image}
+                alt={still.data.alt}
+                widths={[480, 900, 1400, 2000]}
+                sizes="(min-width: 48rem) 50vw, 80vw"
+                quality={82}
+                loading={i === 0 ? "eager" : "lazy"}
+                fetchpriority={i === 0 ? "high" : "auto"}
+              />
+              {
+                still.data.title && (
+                  <span class="hover-caption glass" aria-hidden="true">
+                    <strong>{still.data.title}</strong>
+                    <span>
+                      {still.data.place
+                        ? `${still.data.place}, ${still.data.year}`
+                        : still.data.year}
+                    </span>
+                  </span>
+                )
+              }
+            </a>
+          </li>
+        ))
+      }
+      {
+        trailingClones.map((still) => (
+          <li class="fs-item" data-id={still.id} data-clone="true" aria-hidden="true">
+            <a href={`/stills/${still.id}/`} class="frame" tabindex="-1">
+              <Image
+                src={still.data.image}
+                alt=""
+                widths={[480, 900, 1400, 2000]}
+                sizes="(min-width: 48rem) 50vw, 80vw"
+                quality={82}
+                loading="lazy"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <button class="fs-nav next glass" type="button" aria-label="Next photograph" data-fs-next>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M9 6l6 6-6 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  </section>
+
+  <section class="shell statement" data-reveal>
+    <p class="prose">
+      {site.name} makes photographs and films in {site.location} and wherever the
+      work leads. Commissions, licensing, and archival prints.
+    </p>
+    <p class="label">
+      <a href="/stills/">See the stills</a> &nbsp; <a href="/prints/">See the prints</a>
+    </p>
+  </section>
+
+  {
+    films[0] && (
+      <section class="reel">
+        <div class="shell section-head" data-reveal>
+          <h2>Motion</h2>
+          <p class="label">
+            <a href="/motion/">All films</a>
+          </p>
+        </div>
+        <Film
+          title={films[0].data.title}
+          client={films[0].data.client}
+          year={films[0].data.year}
+          runtime={films[0].data.runtime}
+          role={films[0].data.role}
+          embedUrl={films[0].data.embedUrl}
+          poster={films[0].data.poster}
+          alt={films[0].data.alt}
+        />
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .filmstrip-wrap {
+    position: relative;
+    padding-top: 1.5rem;
+    /* One photo's width — everything else (the peek of its neighbours,
+       where the arrows sit) is derived from this. */
+    --stage-w: 84vw;
+  }
+
+  .filmstrip {
+    display: flex;
+    gap: 0.2rem;
+    margin: 0;
+    padding: 0 calc((100vw - var(--stage-w)) / 2);
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filmstrip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fs-item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    width: var(--stage-w);
+    height: clamp(18rem, 62vw, 26rem);
+  }
+
+  .fs-item .frame {
+    height: 100%;
+  }
+
+  .fs-item .frame img {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 48rem) {
+    .filmstrip-wrap {
+      --stage-w: 58vw;
+    }
+
+    .fs-item {
+      height: clamp(20rem, 42vw, 36rem);
+    }
+  }
+
+  /* A narrow glass rectangle rather than a disc, sharp-cornered — a
+     rail you slide the strip along. The edge highlight (::after) is a
+     linear analogue of the play button's donut ring — light catching
+     the two narrow side edges, dim through the middle. */
+  .fs-nav {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    width: 1.5rem;
+    height: 3.75rem;
+    padding: 0;
+    border-radius: 0;
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      transform 700ms var(--ease-liquid),
+      border-color 700ms var(--ease-liquid);
+  }
+
+  .fs-nav::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.4),
+      transparent 24%,
+      transparent 76%,
+      rgba(255, 255, 255, 0.4)
+    );
+    pointer-events: none;
+  }
+
+  .fs-nav.prev {
+    left: calc((100vw - var(--stage-w)) / 2 - 1.5rem - 0.75rem);
+  }
+
+  .fs-nav.next {
+    right: calc((100vw - var(--stage-w)) / 2 - 1.5rem - 0.75rem);
+  }
+
+  @media (hover: hover) {
+    .fs-nav:hover {
+      transform: scale(1.04);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-nav:hover {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 32rem) {
+    .fs-nav {
+      display: none;
+    }
+  }
+
+  .statement {
+    margin-top: var(--frame-gap);
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .statement p {
+    margin: 0;
+  }
+
+  .reel {
+    margin-top: calc(var(--frame-gap) * 1.25);
+  }
+</style>
+
+<script>
+  function bindFilmstrips() {
+    document.querySelectorAll<HTMLElement>("[data-filmstrip]").forEach((track) => {
+      const wrap = track.closest(".filmstrip-wrap");
+      if (!wrap) return;
+      const prev = wrap.querySelector<HTMLButtonElement>("[data-fs-prev]");
+      const next = wrap.querySelector<HTMLButtonElement>("[data-fs-next]");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const items = () => Array.from(track.querySelectorAll<HTMLElement>(".fs-item"));
+
+      // Land on the first real slide before the first frame is shown —
+      // without this the leading clones (a copy of the last few photos)
+      // would be what greets you instead.
+      const firstReal = track.querySelector<HTMLElement>(".fs-item:not([data-clone])");
+      firstReal?.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
+
+      const centeredItem = (): HTMLElement | null => {
+        const trackRect = track.getBoundingClientRect();
+        const mid = trackRect.left + trackRect.width / 2;
+        let closest: HTMLElement | null = null;
+        let closestDist = Infinity;
+        for (const el of items()) {
+          const r = el.getBoundingClientRect();
+          const dist = Math.abs(r.left + r.width / 2 - mid);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closest = el;
+          }
+        }
+        return closest;
+      };
+
+      // Once scrolling comes to rest, silently swap a landed-on clone for
+      // its real counterpart — same photo, so nothing appears to move.
+      // This is what makes the loop endless: you can keep scrolling (or
+      // clicking) straight through the seam in either direction forever.
+      let settleTimer: ReturnType<typeof setTimeout>;
+      track.addEventListener(
+        "scroll",
+        () => {
+          clearTimeout(settleTimer);
+          settleTimer = setTimeout(() => {
+            const current = centeredItem();
+            if (!current || current.dataset.clone !== "true") return;
+            const real = track.querySelector<HTMLElement>(
+              `.fs-item[data-id="${current.dataset.id}"]:not([data-clone])`,
+            );
+            real?.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
+          }, 120);
+        },
+        { passive: true },
+      );
+
+      const scrollByItem = (dir: number) => {
+        const item = track.querySelector<HTMLElement>(".fs-item");
+        const amount = (item?.getBoundingClientRect().width ?? 320) + 3.2;
+        track.scrollBy({ left: dir * amount, behavior: reduceMotion ? "auto" : "smooth" });
+      };
+
+      prev?.addEventListener("click", () => scrollByItem(-1));
+      next?.addEventListener("click", () => scrollByItem(1));
+    });
+  }
+
+  bindFilmstrips();
+  document.addEventListener("astro:page-load", bindFilmstrips);
+</script>

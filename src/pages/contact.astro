@@ -1,0 +1,122 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../site";
+---
+
+<Base
+  title="Contact"
+  description={`Commission ${site.name} for photography and motion work.`}
+>
+  <div class="shell">
+    <div class="section-head">
+      <h2>Contact</h2>
+      <p class="label">{site.location}</p>
+    </div>
+
+    <p class="prose lead">
+      Tell me what you are making, when you need it, and where it will run. A
+      rough budget helps more than a polished brief.
+    </p>
+
+    <dl class="card">
+      <div>
+        <dt class="label">Email</dt>
+        <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+      </div>
+
+      {
+        site.phone && (
+          <div>
+            <dt class="label">Phone</dt>
+            <dd>
+              <a href={`tel:${site.phone.replace(/\s+/g, "")}`}>{site.phone}</a>
+            </dd>
+          </div>
+        )
+      }
+
+      <div>
+        <dt class="label">Elsewhere</dt>
+        <dd>
+          {
+            site.social.map((s) => (
+              <a href={s.href} rel="me noopener">
+                {s.label}
+              </a>
+            ))
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <section class="work">
+      <h3>What I shoot</h3>
+      <ul class="label list">
+        {site.commissions.shoots.map((item) => <li>{item}</li>)}
+      </ul>
+
+      <h3>Rates</h3>
+      <p class="prose">
+        Day rate from {site.commissions.dayRateFrom}. {site.commissions.note}
+      </p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .shell {
+    padding-top: var(--frame-gap);
+  }
+
+  .lead {
+    margin-bottom: 2.5rem;
+  }
+
+  .card {
+    margin: 0;
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--mat);
+    border: 1px solid var(--rule);
+    max-width: 34rem;
+  }
+
+  .card div {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .card dd {
+    margin: 0;
+    font-size: var(--t-lead);
+  }
+
+  .card dd a + a {
+    margin-left: 1rem;
+  }
+
+  .work {
+    margin-top: var(--frame-gap);
+    max-width: var(--measure);
+  }
+
+  .work h3 {
+    font-size: var(--t-body);
+    margin-bottom: 0.5rem;
+  }
+
+  .work h3 + p,
+  .work h3 + .list {
+    margin-bottom: 2rem;
+  }
+
+  .list {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  .list li {
+    margin-bottom: 0.15rem;
+  }
+</style>

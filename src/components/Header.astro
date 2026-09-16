@@ -1,0 +1,136 @@
+---
+import { site } from "../site";
+
+const [firstName, ...restName] = site.name.split(" ");
+const lastName = restName.join(" ");
+
+const path = Astro.url.pathname;
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/about/", label: "About" },
+  { href: "/stills/", label: "Stills" },
+  { href: "/motion/", label: "Motion" },
+  { href: "/prints/", label: "Prints" },
+  { href: "/contact/", label: "Contact" },
+];
+const isCurrent = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+---
+
+<header class="masthead glass">
+  <div class="shell inner">
+    <a class="identity glass" href="/">
+      <span class="name">
+        <span class="name-first">{firstName}</span> <span class="name-last">{lastName}</span>
+      </span>
+      <span class="label">{site.discipline}</span>
+    </a>
+
+    <nav aria-label="Sections">
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} aria-current={isCurrent(link.href) ? "page" : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .masthead {
+    border: 0;
+    border-bottom: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    padding-block: 1rem;
+  }
+
+  /* .glass is always-visible by default; this pill stays invisible at
+     rest and only becomes real frosted glass on hover/focus, so the
+     header nav doesn't show a permanent outline around the name. */
+  .identity {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.85rem;
+    margin: -0.5rem -0.85rem;
+    border-radius: 999px;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    transition:
+      background 500ms var(--ease-liquid),
+      border-color 500ms var(--ease-liquid),
+      box-shadow 500ms var(--ease-liquid),
+      opacity 500ms var(--ease-liquid);
+  }
+
+  .identity:hover,
+  .identity:focus-visible {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.18) 42%),
+      rgba(255, 255, 255, 0.38);
+    border-color: rgba(24, 26, 23, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      0 12px 34px rgba(24, 26, 23, 0.1);
+  }
+
+  .identity:active {
+    opacity: 0.75;
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    letter-spacing: 0.18em;
+  }
+
+  .name-first {
+    font-weight: 350;
+  }
+
+  .name-last {
+    font-weight: 700;
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    font-size: var(--t-small);
+    font-variation-settings: "wdth" 90, "wght" 500;
+    text-decoration: none;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid transparent;
+  }
+
+  nav a:hover {
+    border-bottom-color: var(--bevel);
+  }
+
+  nav a[aria-current="page"] {
+    border-bottom-color: var(--ink);
+  }
+</style>

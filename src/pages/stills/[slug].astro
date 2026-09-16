@@ -1,0 +1,79 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import Base from "../../layouts/Base.astro";
+import Plate from "../../components/Plate.astro";
+
+export const getStaticPaths = (async () => {
+  const stills = (await getCollection("stills")).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+
+  return stills.map((still, index) => ({
+    params: { slug: still.id },
+    props: {
+      still,
+      previous: stills[index - 1] ?? stills[stills.length - 1],
+      next: stills[index + 1] ?? stills[0],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { still, previous, next } = Astro.props;
+const { Content } = await render(still);
+const caption = [still.data.place, still.data.year].filter(Boolean).join(", ");
+const description = still.data.title
+  ? `${still.data.title}${caption ? `. ${caption}.` : "."}`
+  : undefined;
+---
+
+<Base title={still.data.title} description={description}>
+  <article class="shell">
+    <Plate
+      image={still.data.image}
+      alt={still.data.alt}
+      title={still.data.title}
+      place={still.data.place}
+      year={still.data.year}
+      print={still.data.print}
+      layout="beside"
+      priority={true}
+      sizes="(min-width: 60rem) 68vw, 92vw"
+      transitionName={`still-${still.id}`}
+    />
+
+    <div class="note prose">
+      <Content />
+    </div>
+
+    <nav class="label walk" aria-label="More pictures">
+      <a href={`/stills/${previous.id}/`}>{previous.data.title ?? "Previous"}</a>
+      <a href="/stills/">All stills</a>
+      <a href={`/stills/${next.id}/`}>{next.data.title ?? "Next"}</a>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .shell {
+    padding-top: var(--frame-gap);
+  }
+
+  .note {
+    margin-top: 2rem;
+  }
+
+  .note:empty {
+    display: none;
+  }
+
+  .walk {
+    margin-top: var(--frame-gap);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+</style>

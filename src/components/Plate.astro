@@ -1,0 +1,141 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  /** Leave unset to skip the wall label entirely. */
+  title?: string;
+  place?: string;
+  year?: number;
+  print?: {
+    available: boolean;
+    process: string;
+    edition?: string;
+    sizes?: string;
+    priceFrom?: string;
+    buyUrl?: string;
+  };
+  /** "beside" puts the wall label to the right, as in a gallery hang. */
+  layout?: "beside" | "below";
+  href?: string;
+  priority?: boolean;
+  sizes?: string;
+  /** Shared across pages so the photo morphs instead of cutting when
+   *  navigating between the grid and its own page. */
+  transitionName?: string;
+}
+
+const {
+  image,
+  alt,
+  title,
+  place,
+  year,
+  print,
+  layout = "below",
+  href,
+  priority = false,
+  sizes = "(min-width: 60rem) 45vw, 92vw",
+  transitionName,
+} = Astro.props;
+---
+
+<figure class:list={["plate", layout]} data-reveal>
+  {
+    href ? (
+      <a href={href} class="frame" transition:name={transitionName}>
+        <Image
+          src={image}
+          alt={alt}
+          widths={[640, 1024, 1600, 2200]}
+          sizes={sizes}
+          quality={82}
+          loading={priority ? "eager" : "lazy"}
+          fetchpriority={priority ? "high" : "auto"}
+        />
+        {
+          title && (
+            <span class="hover-caption glass" aria-hidden="true">
+              <strong>{title}</strong>
+              <span>{place ? `${place}, ${year}` : year}</span>
+            </span>
+          )
+        }
+      </a>
+    ) : (
+      <div class="frame" transition:name={transitionName}>
+        <Image
+          src={image}
+          alt={alt}
+          widths={[640, 1024, 1600, 2200]}
+          sizes={sizes}
+          quality={82}
+          loading={priority ? "eager" : "lazy"}
+          fetchpriority={priority ? "high" : "auto"}
+        />
+      </div>
+    )
+  }
+
+  {
+    (title || print?.available) && (
+      <figcaption class="label">
+        {title && <strong>{title}</strong>}
+        {title && (place ? <span>{place}, {year}</span> : year && <span>{year}</span>)}
+
+        {
+          print?.available && (
+            <span class="print glass">
+              {print.process}
+              {print.edition && <span class="line">{print.edition}</span>}
+              {print.sizes && <span class="line">{print.sizes}</span>}
+              {print.priceFrom && <span class="line">From {print.priceFrom}</span>}
+            </span>
+          )
+        }
+
+        {
+          print?.available && print.buyUrl && (
+            <a class="order" href={print.buyUrl} rel="noopener">
+              Order print
+            </a>
+          )
+        }
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .plate {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  figcaption span {
+    display: block;
+  }
+
+  .print {
+    display: block;
+    margin-top: 0.6rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 2px;
+  }
+
+  .print .line {
+    display: block;
+  }
+
+  /* Hung with the label to the right, the way work is captioned on a wall. */
+  @media (min-width: 60rem) {
+    .plate.beside {
+      grid-template-columns: minmax(0, 1fr) 13rem;
+      gap: 2rem;
+      align-items: start;
+    }
+  }
+</style>

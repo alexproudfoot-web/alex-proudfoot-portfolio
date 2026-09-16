@@ -1,0 +1,101 @@
+---
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import { site } from "../site";
+import portrait from "../assets/images/DSCF9214.JPG";
+---
+
+<Base
+  title="About"
+  description={`About ${site.name} — photography and motion, based in ${site.location}.`}
+>
+  <div class="shell">
+    <div class="section-head">
+      <h2>About</h2>
+      <p class="label">{site.location}</p>
+    </div>
+
+    <div class="layout">
+      <figure class="portrait frame">
+        <Image
+          src={portrait}
+          alt={`${site.name} standing in a sunflower field, giving a thumbs up, camera around his neck.`}
+          widths={[480, 720, 960]}
+          sizes="(min-width: 48rem) 24rem, 90vw"
+          quality={82}
+          loading="eager"
+        />
+      </figure>
+
+      <div class="bio">
+        <p class="prose">
+          {site.location} is home base, but most of the work happens
+          somewhere else — a track, a driveway, a stretch of road at the
+          right hour.
+        </p>
+        <p class="prose">
+          I started shooting in 2019. Cars were already the obsession; the
+          camera just gave it somewhere to go.
+        </p>
+        <p class="prose">
+          Now it's one thing: chasing good light, good cars, and the people
+          who keep them running.
+        </p>
+
+        <p class="label contact-line">
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          {
+            site.social.map((s) => (
+              <a href={s.href} rel="me noopener">
+                {s.label}
+              </a>
+            ))
+          }
+          <a href="/contact/">Inquire</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .shell {
+    padding-top: var(--frame-gap);
+    padding-bottom: var(--frame-gap);
+  }
+
+  .layout {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .portrait {
+    margin: 0;
+    max-width: 22rem;
+  }
+
+  .bio {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    max-width: var(--measure);
+  }
+
+  .contact-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .layout {
+      grid-template-columns: 20rem minmax(0, 1fr);
+      gap: var(--frame-gap);
+    }
+
+    .portrait {
+      max-width: none;
+    }
+  }
+</style>

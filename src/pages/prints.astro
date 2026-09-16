@@ -1,0 +1,177 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import { site } from "../site";
+
+const forSale = (await getCollection("stills"))
+  .filter((still) => still.data.print?.available)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Prints"
+  description="Archival pigment prints, made to order and shipped flat or rolled."
+>
+  <div class="shell">
+    <div class="section-head">
+      <h2>Prints</h2>
+      <p class="label">{forSale.length} available</p>
+    </div>
+
+    <p class="prose intro">
+      Every print is made to order on cotton rag paper, inspected by hand, and
+      signed on the reverse. Orders are placed through a secure checkout and
+      ship within two weeks.
+    </p>
+
+    <ul class="sheet">
+      {
+        forSale.map((still) => (
+          <li>
+            <a class="thumb" href={`/stills/${still.id}/`}>
+              <Image
+                src={still.data.image}
+                alt={still.data.alt}
+                widths={[240, 480]}
+                sizes="150px"
+                quality={78}
+                loading="lazy"
+              />
+            </a>
+
+            <div class="details">
+              <h3>{still.data.title}</h3>
+              <p class="label">
+                {[still.data.place, String(still.data.year)]
+                  .filter(Boolean)
+                  .join(", ")}
+              </p>
+              <p class="label spec">
+                <span>{still.data.print.process}</span>
+                {still.data.print.edition && (
+                  <span>{still.data.print.edition}</span>
+                )}
+                {still.data.print.sizes && <span>{still.data.print.sizes}</span>}
+              </p>
+            </div>
+
+            <div class="price">
+              {still.data.print.priceFrom && (
+                <p class="figure">From {still.data.print.priceFrom}</p>
+              )}
+              {still.data.print.buyUrl && (
+                <a class="order" href={still.data.print.buyUrl} rel="noopener">
+                  Order print
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="terms">
+      <h3>Before you order</h3>
+      <p class="prose">
+        Prints are unframed and unmatted, with a white border for handling and
+        framing. Sizes are paper dimensions. Colour on your screen will differ
+        slightly from paper; if an exact match matters for your project, write to
+        me first and I will send a proof.
+      </p>
+      <p class="prose">
+        Damaged deliveries are replaced. For a size that is not listed, a
+        different paper, or a licence to use an image commercially, email {" "}
+        <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .shell {
+    padding-top: var(--frame-gap);
+  }
+
+  .intro {
+    margin-bottom: 2.5rem;
+  }
+
+  .sheet {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .sheet li {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: 1rem 1.25rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+
+  .thumb {
+    display: block;
+    background: var(--mat);
+    padding: 0.35rem;
+    border: 1px solid var(--rule);
+    line-height: 0;
+  }
+
+  .thumb :global(img) {
+    width: 100%;
+    height: auto;
+    outline: 1px solid var(--bevel);
+  }
+
+  .details h3 {
+    font-size: var(--t-body);
+    margin-bottom: 0.2rem;
+  }
+
+  .details p {
+    margin: 0;
+  }
+
+  .spec {
+    margin-top: 0.5rem !important;
+  }
+
+  .spec span {
+    display: block;
+  }
+
+  .price {
+    grid-column: 2;
+  }
+
+  .figure {
+    margin: 0;
+    font-variation-settings: "wdth" 92, "wght" 600;
+  }
+
+  @media (min-width: 48rem) {
+    .sheet li {
+      grid-template-columns: 6rem minmax(0, 1fr) 11rem;
+      align-items: center;
+    }
+
+    .price {
+      grid-column: 3;
+      text-align: right;
+    }
+  }
+
+  .terms {
+    margin-top: var(--frame-gap);
+    max-width: var(--measure);
+  }
+
+  .terms h3 {
+    font-size: var(--t-body);
+    margin-bottom: 0.6rem;
+  }
+</style>

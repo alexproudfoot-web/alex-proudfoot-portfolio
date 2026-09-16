@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Film from "../../components/Film.astro";
+
+const films = (await getCollection("films")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<Base title="Motion" description="Films and motion work.">
+  <div class="shell head">
+    <div class="section-head">
+      <h2>Motion</h2>
+      <p class="label">Press play to load each film</p>
+    </div>
+  </div>
+
+  {
+    films.map((film) => (
+      <Film
+        title={film.data.title}
+        client={film.data.client}
+        year={film.data.year}
+        runtime={film.data.runtime}
+        role={film.data.role}
+        embedUrl={film.data.embedUrl}
+        poster={film.data.poster}
+        alt={film.data.alt}
+      />
+    ))
+  }
+</Base>
+
+<style>
+  .head {
+    padding-top: var(--frame-gap);
+  }
+
+  .head .section-head {
+    margin-bottom: 0;
+  }
+</style>

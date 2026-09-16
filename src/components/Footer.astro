@@ -1,0 +1,65 @@
+---
+import { site } from "../site";
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="shell inner">
+    <p class="pitch">
+      Available for commissions and licensing.
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+    </p>
+
+    <ul class="links">
+      {
+        site.social.map((s) => (
+          <li>
+            <a href={s.href} rel="me noopener">
+              {s.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="label fine">
+      All photographs and films © {year} {site.name}. No image on this site may be reproduced,
+      licensed, or used to train a model without written permission.
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-top: calc(var(--frame-gap) * 1.5);
+    border-top: 1px solid var(--rule);
+    padding-block: 2.5rem 3.5rem;
+  }
+
+  .inner {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .pitch {
+    font-size: var(--t-lead);
+    font-variation-settings: "wdth" 96, "wght" 450;
+    margin: 0;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--t-small);
+    font-variation-settings: "wdth" 90, "wght" 500;
+  }
+
+  .fine {
+    max-width: 46ch;
+    margin: 0;
+  }
+</style>
